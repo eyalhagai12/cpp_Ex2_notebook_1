@@ -7,7 +7,7 @@
 using namespace ariel;
 
 const int LINE_LEN = 100;
-const int extra = 3;
+const int extra = 1;
 
 // add str to the row starting at column
 void add_to_row(std::string &line, const std::string &str, size_t column)
@@ -174,9 +174,7 @@ void page::show()
         start = this->first_row - extra;
     }
 
-    std::cout << "Start: " << start << "\nEnd: " << this->last_row + extra << std::endl;
-
-    for (int i = start; i < this->last_row + extra; ++i)
+    for (int i = start; i < this->last_row + extra + 1; ++i)
     {
         std::string &str = this->rows[i];
 
@@ -241,6 +239,14 @@ void page::erase(int row, int column, ariel::Direction dir, int length)
             // check if the line exists
             if (line.empty())
             {
+                if (row + i > this->last_row)
+                {
+                    this->last_row = row + i;
+                }
+                if (row + i < this->first_row)
+                {
+                    this->first_row = row + i;
+                }
                 line.append(LINE_LEN, '_');
             }
 
@@ -289,10 +295,11 @@ std::string page::read(int row, int column, ariel::Direction dir, int length)
             if (!line.empty())
             {
                 // check if line is empty and delete if not
-                if (line[column_idx] != '_')
-                {
-                    result.push_back(line[column_idx]);
-                }
+                result.push_back(line[column_idx]);
+            }
+            else
+            {
+                result.push_back('_');
             }
         }
     }
