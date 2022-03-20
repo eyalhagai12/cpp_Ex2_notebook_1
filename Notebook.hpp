@@ -6,6 +6,7 @@
 
 namespace ariel
 {
+    const int LINE_LEN = 100;
     std::vector<std::string> split_to_lines(std::string text, size_t start_col, size_t line_length);
     class page;
     class Notebook;

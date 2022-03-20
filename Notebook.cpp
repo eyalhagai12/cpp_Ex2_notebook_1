@@ -6,7 +6,6 @@
 
 using namespace ariel;
 
-const int LINE_LEN = 100;
 const int extra = 1;
 
 // add str to the row starting at column
@@ -268,7 +267,14 @@ std::string page::read(int row, int column, ariel::Direction dir, int length)
             std::string &line = this->rows[row];
 
             // check if the line is not empty and delete if not
-            result.push_back(line[idx]);
+            if (line.empty())
+            {
+                result.push_back('_');
+            }
+            else
+            {
+                result.push_back(line[idx]);
+            }
 
             // go to next letter
             idx++;
