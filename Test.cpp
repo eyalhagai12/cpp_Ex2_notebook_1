@@ -9,6 +9,15 @@ using namespace std;
 using ariel::Direction;
 
 ariel::Notebook notebook;
+vector<string> words = {"hello world", "test phrase", "ariel university", "c++ is nice", "1 + 1 = 2",
+						"welcome to the metaverse",
+						"i am mark zuckerberg"};
+
+string word;
+
+const size_t pages = 5;
+size_t rows = words.size();
+size_t num_of_letters = 0;
 
 int random(int min, int max) // range : [min, max]
 {
@@ -21,18 +30,8 @@ int random(int min, int max) // range : [min, max]
 	return min + rand() % ((max + 1) - min);
 }
 
-TEST_CASE("Good input")
+TEST_CASE("horizontal write test")
 {
-	vector<string> words = {"hello world", "test phrase", "ariel university", "c++ is nice", "1 + 1 = 2",
-							"welcome to the metaverse",
-							"i am mark zuckerberg"};
-
-	string word;
-
-	const size_t pages = 5;
-	size_t rows = words.size();
-	size_t num_of_letters = 0;
-
 	// horizontal writing
 	for (size_t i = 0; i < pages; ++i)
 	{
@@ -62,7 +61,10 @@ TEST_CASE("Good input")
 			}
 		}
 	}
+}
 
+TEST_CASE("vertical write test")
+{
 	// vertical writing
 	for (size_t i = pages; i < pages * 2; ++i)
 	{
@@ -91,5 +93,32 @@ TEST_CASE("Good input")
 				j++;
 			}
 		}
+	}
+}
+
+TEST_CASE("writing on existing stuff")
+{
+	int page = 126;
+	int row = 5;
+	int col = 50;
+	word = "welcome to the metaverse";
+
+	// write to some place
+	notebook.write(page, row, col, Direction::Horizontal, word);
+
+	for (int i = 0; i < word.size() * 2; ++i)
+	{
+		CHECK_THROWS(notebook.write(page, row, col + i, Direction::Horizontal, word));
+	}
+
+	page++;
+	row = 50;
+	col = 5;
+
+	notebook.write(page, row, col, Direction::Horizontal, word);
+
+	for (int i = 0; i < word.size() * 2; ++i)
+	{
+		CHECK_THROWS(notebook.write(page, row + i, col, Direction::Vertical, word));
 	}
 }
