@@ -80,6 +80,11 @@ void page::write(int row, int column, Direction dir, const std::string &text)
 {
 	if (dir == Direction::Horizontal)
 	{
+		if (text.size() + (size_t)column >= LINE_LEN)
+		{
+			throw std::invalid_argument("Text exceeds max row length\n");
+		}
+
 		// check if the row is empty
 		if (this->rows[row].empty())
 		{
@@ -97,38 +102,8 @@ void page::write(int row, int column, Direction dir, const std::string &text)
 			// std::cout << "Created row " << row << std::endl;
 		}
 
-		// split to string of length 100 (and one that completes the current line if needed)
-		std::vector<std::string> str_vec = split_to_lines(text, (size_t)column, LINE_LEN);
-
-		// add to first row
-		add_to_row(this->rows[row], str_vec[0], (size_t)column);
-		// std::cout << this->rows[row] << std::endl
-		//           << std::endl;
-
-		// add to the new rows if needed
-		for (size_t i = 1; i < str_vec.size(); ++i)
-		{
-			size_t new_row = (size_t)row + i;
-			if (this->rows[new_row].empty())
-			{
-				// check if its the last row
-				if (new_row > this->last_row)
-				{
-					this->last_row = new_row;
-				}
-				if (new_row < this->first_row)
-				{
-					this->first_row = new_row;
-				}
-
-				this->rows[new_row].append(LINE_LEN, '_');
-				// std::cout << "Created row " << new_row << std::endl;
-			}
-
-			add_to_row(this->rows[new_row], str_vec[i], 0);
-			// std::cout << this->rows[new_row] << std::endl
-			//           << std::endl;
-		}
+		// add to row
+		add_to_row(this->rows[row], text, (size_t)column);
 	}
 	else
 	{
@@ -161,7 +136,7 @@ void page::write(int row, int column, Direction dir, const std::string &text)
 			else
 			{
 				// throw std::invalid_argument("you are trying to write on stuff that has already been written or deleted!\n");
-				std::cout << "Throw error!!!\n";
+				std::cout << "Throw error" << std::endl; 
 			}
 		}
 	}
@@ -196,6 +171,12 @@ void page::erase(int row, int column, ariel::Direction dir, int length)
 {
 	if (dir == Direction::Horizontal)
 	{
+		// check if the erase will exceed the row length
+		if (column + length >= LINE_LEN)
+		{
+			throw std::invalid_argument("You are trying to erase out of the row bounds\n");
+		}
+
 		size_t idx = (size_t)column;
 		for (size_t i = 0; i < length; ++i)
 		{
@@ -218,15 +199,6 @@ void page::erase(int row, int column, ariel::Direction dir, int length)
 
 			// go to next letter
 			idx++;
-
-			// check if you need to go down a line
-			if (idx >= LINE_LEN)
-			{
-				row++;
-			}
-
-			// set the index properly
-			idx = idx % LINE_LEN;
 		}
 	}
 	else
@@ -235,7 +207,6 @@ void page::erase(int row, int column, ariel::Direction dir, int length)
 		for (int i = 0; i < length; ++i)
 		{
 			std::string &line = this->rows[row + i];
-			// std::cout << "Looking at row " << row + i << std::endl;
 
 			// check if the line exists
 			if (line.empty())
@@ -262,6 +233,12 @@ std::string page::read(int row, int column, ariel::Direction dir, int length)
 
 	if (dir == Direction::Horizontal)
 	{
+		// check if the erase will exceed the row length
+		if (column + length >= LINE_LEN)
+		{
+			throw std::invalid_argument("You are trying to read out of the row bounds\n");
+		}
+
 		size_t idx = (size_t)column;
 		for (size_t i = 0; i < length; ++i)
 		{
@@ -280,15 +257,6 @@ std::string page::read(int row, int column, ariel::Direction dir, int length)
 
 			// go to next letter
 			idx++;
-
-			// check if you need to go down a line
-			if (idx >= LINE_LEN)
-			{
-				row++;
-			}
-
-			// set the index properly
-			idx = idx % LINE_LEN;
 		}
 	}
 	else
